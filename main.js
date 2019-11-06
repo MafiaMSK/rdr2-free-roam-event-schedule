@@ -50,46 +50,9 @@
       var text = document.createElement('span');
       text.innerText = event.timeString + ' - ' + event.name;
       li.append(text);
-      li.append(getFormLink(event, key, id));
       list.append(li);
     });
     el.container.innerHTML = list.outerHTML;
-  }
-
-  /**
-   * Create an anchor link
-   * @param {Object} event Event datum
-   * @param {string} key Property key (either freeRoam/role)
-   * @param {string} id Unique identifier
-   * @return {Node} anchor link element
-   */
-  function getFormLink(event, key, id) {
-    var anchor = document.createElement('a');
-    anchor.setAttribute('target', '_blank');
-    var eventType = {
-      freeRoam: 'Free-roam+event',
-      role: 'Role+event'
-    };
-    var qsValues = {
-      'entry.1897203079': eventType[key],
-      'entry.1753454597': timezone,
-      'entry.1235834234': event.timeString,
-      'entry.1278810820': event.utcTimeString,
-      'entry.698549775': event.name,
-      'entry.988863521': String(id)
-    };
-    var queryString = Object.keys(qsValues)
-      .map(function(qsKey) {
-        return [qsKey, qsValues[qsKey].replace(/\s/g, '+')].join('=');
-      })
-      .join('&');
-    var url =
-      'https://docs.google.com/forms/d/e/1FAIpQLSeaEdri09zJXnLksx4icLAY70tWGGDqyuPvaQZQMnc4R9R9ag/viewform?usp=pp_url&' +
-      queryString;
-    anchor.setAttribute('href', url);
-    anchor.className = 'form-link';
-    anchor.innerText = 'Submit correction';
-    return anchor;
   }
 
   /**
@@ -157,13 +120,13 @@
   function getEtaText(t) {
     t = t / 1000; // convert to seconds
     function s(t) {
-      return t === 1 ? '' : 's';
+      return t === 1 ? '' : 'ут';
     }
     if (t < 60) {
-      return Math.round(t) + ' second' + s(t);
+      return Math.round(t) + ' сек.';
     }
     t = Math.round(t / 60); // convert to minutes
-    return t + ' minute' + s(t);
+    return t + ' мин.';
   }
 
   /**
@@ -213,31 +176,4 @@
 
   // Update event list every 10 seconds
   window.setInterval(update, 10000);
-})();
-
-//--- Theme switcher ---//
-(function() {
-  var localStorageKey = 'rdr2-event-schedule-theme';
-  var THEMES = ['dark', 'light'];
-  var themeButton = document.querySelector('#theme');
-  // Detect localstorage value and use that if it exists
-  var currentTheme = localStorage.getItem(localStorageKey) || THEMES[0];
-  updateTheme(currentTheme);
-
-  function updateTheme(theme, updateStorage) {
-    THEMES.forEach(function(d) {
-      document.body.classList.remove(d);
-    });
-    document.body.classList.add(theme);
-    if (updateStorage) {
-      localStorage.setItem(localStorageKey, theme);
-    }
-    currentTheme = theme;
-  }
-
-  // Toggle theme on button click
-  themeButton.addEventListener('click', function() {
-    var newTheme = THEMES[0] === currentTheme ? THEMES[1] : THEMES[0];
-    updateTheme(newTheme, true);
-  });
 })();
